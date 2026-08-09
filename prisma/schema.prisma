@@ -1,0 +1,64 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./data.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Suggestion {
+  id          Int      @id @default(autoincrement())
+  authorId    String
+  content     String
+  status      String   @default("pending") // pending | accepted | rejected
+  messageId   String
+  threadId    String?
+  reviewedBy  String?
+  createdAt   DateTime @default(now())
+}
+
+model ModCase {
+  id          Int      @id @default(autoincrement())
+  type        String   // ban | kick | mute | unmute | unban | warn
+  targetId    String
+  moderatorId String
+  reason      String?
+  durationMin Int?
+  createdAt   DateTime @default(now())
+}
+
+model Warning {
+  id          Int      @id @default(autoincrement())
+  userId      String
+  moderatorId String
+  reason      String
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+}
+
+model Ticket {
+  id           Int       @id @default(autoincrement())
+  ticketNumber Int       @unique
+  channelId    String    @unique
+  messageId    String?
+  category     String    // hile | magaza | sikayet | diger
+  ownerId      String
+  claimedBy    String?
+  claimedAt    DateTime?
+  status       String    @default("open") // open | closed
+  closedBy     String?
+  closeReason  String?
+  rating       Int?      // 1-5
+  createdAt    DateTime  @default(now())
+  closedAt     DateTime?
+}
+
+model StaffApplication {
+  id         Int      @id @default(autoincrement())
+  userId     String
+  answers    String   // JSON string
+  status     String   @default("pending") // pending | accepted | rejected
+  reviewedBy String?
+  createdAt  DateTime @default(now())
+}
