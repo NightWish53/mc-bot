@@ -13,21 +13,18 @@ if not exist ".env" (
     exit
 )
 
-echo [1/4] Eski bot surecleri kapatiliyor...
-powershell -NoProfile -Command "Get-Process node -ErrorAction SilentlyContinue | Stop-Process -Force" >nul 2>&1
-timeout /t 2 /nobreak >nul
-
-echo [2/4] Gereksinimler yukleniyor (Ilk acilista uzun surebilir)...
+echo [1/3] Gereksinimler yukleniyor (Ilk acilista uzun surebilir)...
 call pnpm install
 
-echo [3/4] Veritabani ve slash komutlari esitleniyor...
+echo [2/3] Veritabani ve slash komutlari esitleniyor...
 call npx prisma db push
 call pnpm deploy-commands
 
-echo [4/4] Bot baslatiliyor...
+echo [3/3] Proje derleniyor ve bot baslatiliyor...
 echo     (Durdurmak icin bu pencereyi kapat veya Ctrl+C)
 echo.
-pnpm dev
+call pnpm build
+pnpm start
 
 echo.
 echo Bot kapandi. Pencereden cikmak icin bir tusa basin.

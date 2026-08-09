@@ -13,7 +13,7 @@ Tek bir sunucu için özelleştirilmiş, kurulumu inanılmaz kolay, hafif ve per
 *   **⚡ Bağımsız Çalışır:** Sunucuya dışarıdan ping atarak aktif oyuncuları, gecikmeyi ve MOTD'yi anlık olarak çeker.
 *   **📊 Canlı İstatistik Kanalları:** Oyuncu sayısı ve rekor oyuncu verilerini otomatik olarak ses kanalı ismine yansıtır.
 *   **🚨 Offline (Çökme) Alarmı:** Sunucu yanıt vermediğinde belirlediğiniz kanala otomatik olarak bildirim gönderir.
-*   **🎫 Gelişmiş Ticket Sistemi:** Kategori seçmeli ticket paneli, ticket devralma/bırakma, üye ekleme/çıkarma (ticket-ekle / ticket-çıkar), transcript (log dosyası) ve yıldızlı puanlama sistemi.
+*   **🎫 Gelişmiş Ticket Sistemi:** Kategori seçmeli ticket paneli, ticket devralma/bırakma, üye ekleme/çıkarma (ticket-ekle / ticket-cikar), transcript (log dosyası) ve yıldızlı puanlama sistemi.
 *   **💡 Öneri Sistemi:** Üyelerin fikirlerini oylamaya sunan, kabul/red butonlu gelişmiş thread (alt başlık) yapısı.
 *   **🛡️ Moderasyon Sistemi:** Ban, Kick, Uyarı, Timeout (Mute) işlemleri ve detaylı ceza geçmişi kaydı.
 *   **📝 Yetkili Başvuru Sistemi:** Form (Modal) üzerinden başvuru alma ve özel kanaldan onay/red işlemi.
@@ -55,8 +55,8 @@ Botu kendi bilgisayarınızda veya bir VDS/VPS (Sanal Sunucu) üzerinde kurmak i
 **1. Dosyaları İndirin:**
 Projeyi GitHub üzerinden klonlayın:
 ```bash
-git clone https://github.com/KULLANICI_ADINIZ/proje-adi.git
-cd proje-adi
+git clone https://github.com/NightWish53/mc-bot.git
+cd mc-bot
 ```
 
 **2. Gerekli Paketleri Yükleyin:**
