@@ -1,13 +1,11 @@
-import { MessageFlags, ActionRowBuilder,
+import { ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
   ChannelType,
-  GuildMember,
   type ButtonInteraction,
   type Message, } from 'discord.js';
-import { env } from '../config/env.js';
 import { prisma } from '../database/prisma.js';
-import { Colors, createEmbed, errorEmbed, successEmbed } from '../utils/embeds.js';
+import { Colors, createEmbed } from '../utils/embeds.js';
 import { logger } from '../utils/logger.js';
 
 
@@ -97,16 +95,13 @@ export async function handleSuggestionVote(interaction: ButtonInteraction, actio
   downvoters = downvoters.filter((v) => !v.includes(userId));
 
   // Add user to the correct array (toggle logic)
-  let voted = false;
   if (action === 'upvote') {
     if (!upvoteField?.value.includes(userId)) {
       upvoters.push(userMention);
-      voted = true;
     }
   } else {
     if (!downvoteField?.value.includes(userId)) {
       downvoters.push(userMention);
-      voted = true;
     }
   }
 

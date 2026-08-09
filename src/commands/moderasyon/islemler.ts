@@ -1,5 +1,5 @@
 import { SlashCommandBuilder, type ChatInputCommandInteraction } from 'discord.js';
-import { errorEmbed, warningEmbed } from '../../utils/embeds.js';
+import { createEmbed, errorEmbed } from '../../utils/embeds.js';
 import { hasModRole, requireModeratorMember } from '../../utils/permissions.js';
 import { buildActionsEmbed, getModeratorActions } from '../../services/moderation.service.js';
 
@@ -22,7 +22,7 @@ export default {
 
     if (data.cases.length === 0 && data.warnings.length === 0) {
       await interaction.editReply({
-        embeds: [warningEmbed('İşlem Geçmişi Boş', `<@${target.id}> henüz hiçbir moderasyon işlemi gerçekleştirmemiş.`)],
+        embeds: [createEmbed({ title: 'İşlem Geçmişi Boş', description: `<@${target.id}> henüz hiçbir moderasyon işlemi gerçekleştirmemiş.` })],
       });
       return;
     }

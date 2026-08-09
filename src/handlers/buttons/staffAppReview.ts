@@ -1,11 +1,11 @@
 import { type ButtonInteraction, PermissionFlagsBits } from 'discord.js';
 import { prisma } from '../../database/prisma.js';
-import { Colors, createEmbed, successEmbed, errorEmbed } from '../../utils/embeds.js';
+import { createEmbed, errorEmbed, Colors } from '../../utils/embeds.js';
 import { logger } from '../../utils/logger.js';
 import { safeDm } from '../../utils/dm.js';
 import { env } from '../../config/env.js';
 
-async function handleStaffAppReview(interaction: ButtonInteraction, action: 'accept' | 'reject', appIdStr: string) {
+async function handleStaffAppReview(interaction: ButtonInteraction, action: 'accept' | 'reject_hard' | 'reject_soft', appIdStr: string) {
   if (!interaction.memberPermissions?.has(PermissionFlagsBits.Administrator)) {
     await interaction.reply({
       embeds: [errorEmbed('Yetki Yok', 'Başvuruları yalnızca yöneticiler değerlendirebilir.')],
@@ -35,33 +35,45 @@ async function handleStaffAppReview(interaction: ButtonInteraction, action: 'acc
   await interaction.deferUpdate();
 
   const isAccepted = action === 'accept';
+  const isSoftReject = action === 'reject_soft';
   const newStatus = isAccepted ? 'accepted' : 'rejected';
 
   try {
-    await prisma.staffApplication.update({
-      where: { id: appId },
-      data: {
-        status: newStatus,
-        reviewedBy: interaction.user.id,
-      },
-    });
+    if (isSoftReject) {
+      await prisma.staffApplication.delete({
+        where: { id: appId },
+      });
+    } else {
+      await prisma.staffApplication.update({
+        where: { id: appId },
+        data: {
+          status: newStatus,
+          reviewedBy: interaction.user.id,
+        },
+      });
+    }
 
     const oldEmbed = interaction.message.embeds[0];
     if (!oldEmbed) return;
 
     const newFields = oldEmbed.fields.map((f) => {
       if (f.name === 'Durum') {
-        return { name: 'Durum', value: isAccepted ? '✅ Kabul Edildi' : '❌ Reddedildi', inline: true };
+        let statusText = isAccepted ? '✅ Kabul Edildi' : '❌ Reddedildi (Kalıcı)';
+        if (isSoftReject) statusText = '🔄 Reddedildi (Tekrar Başvurabilir)';
+        return { name: 'Durum', value: statusText, inline: true };
       }
       return f;
     });
 
     newFields.push({ name: 'Değerlendiren', value: `<@${interaction.user.id}>`, inline: true });
 
+    let embedTitle = isAccepted ? '✅ Başvuru Kabul Edildi' : '❌ Başvuru Reddedildi (Kalıcı)';
+    if (isSoftReject) embedTitle = '🔄 Başvuru Reddedildi (Tekrar Şansı Var)';
+
     const updatedEmbed = createEmbed({
-      title: isAccepted ? '✅ Başvuru Kabul Edildi' : '❌ Başvuru Reddedildi',
+      title: embedTitle,
       description: oldEmbed.description || '',
-      color: isAccepted ? Colors.SUCCESS : Colors.ERROR,
+      color: isAccepted ? Colors.SUCCESS : (isSoftReject ? Colors.WARNING : Colors.ERROR),
       fields: newFields,
       thumbnail: oldEmbed.thumbnail?.url,
     });
@@ -71,12 +83,20 @@ async function handleStaffAppReview(interaction: ButtonInteraction, action: 'acc
       components: [],
     });
 
+    let dmTitle = isAccepted ? 'Tebrikler! 🎉' : 'Başvurunuz Reddedildi';
+    let dmDesc = isAccepted
+      ? `**${env.SERVER_NAME}** sunucusuna yaptığınız yetkili başvurusu **kabul edildi**! Ekibimize hoş geldiniz, yetkililer en kısa sürede sizinle iletişime geçecektir.`
+      : `**${env.SERVER_NAME}** sunucusuna yaptığınız yetkili başvurusu maalesef reddedildi. İlginiz için teşekkür ederiz.`;
+
+    if (isSoftReject) {
+      dmTitle = 'Başvurunuz Reddedildi 🔄';
+      dmDesc = `**${env.SERVER_NAME}** sunucusuna yaptığınız yetkili başvurusu reddedildi. Ancak size **tekrar başvuru yapma hakkı** tanındı. Eksiklerinizi giderdikten sonra tekrar başvurabilirsiniz.`;
+    }
+
     const dmEmbed = createEmbed({
-      title: isAccepted ? 'Tebrikler! 🎉' : 'Başvurunuz Reddedildi',
-      description: isAccepted
-        ? `**${env.SERVER_NAME}** sunucusuna yaptığınız yetkili başvurusu **kabul edildi**! Ekibimize hoş geldiniz, yetkililer en kısa sürede sizinle iletişime geçecektir.`
-        : `**${env.SERVER_NAME}** sunucusuna yaptığınız yetkili başvurusu maalesef reddedildi. İlginiz için teşekkür ederiz.`,
-      color: isAccepted ? Colors.SUCCESS : Colors.ERROR,
+      title: dmTitle,
+      description: dmDesc,
+      color: isAccepted ? Colors.SUCCESS : (isSoftReject ? Colors.WARNING : Colors.ERROR),
     });
     try {
       const user = await interaction.client.users.fetch(application.userId);
@@ -99,10 +119,17 @@ export default [
     },
   },
   {
-    customIdPrefix: 'staff_app_reject',
+    customIdPrefix: 'staff_app_reject_soft',
     async run(interaction: ButtonInteraction) {
       const appId = interaction.customId.split(':')[1];
-      if (appId) await handleStaffAppReview(interaction, 'reject', appId);
+      if (appId) await handleStaffAppReview(interaction, 'reject_soft', appId);
+    },
+  },
+  {
+    customIdPrefix: 'staff_app_reject_hard',
+    async run(interaction: ButtonInteraction) {
+      const appId = interaction.customId.split(':')[1];
+      if (appId) await handleStaffAppReview(interaction, 'reject_hard', appId);
     },
   },
 ];

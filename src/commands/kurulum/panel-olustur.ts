@@ -1,6 +1,6 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, SlashCommandBuilder, ChannelType, type ChatInputCommandInteraction } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, SlashCommandBuilder, ChannelType, PermissionFlagsBits, type ChatInputCommandInteraction } from 'discord.js';
 import { env } from '../../config/env.js';
-import { errorEmbed, successEmbed, warningEmbed } from '../../utils/embeds.js';
+import { createEmbed, errorEmbed, successEmbed } from '../../utils/embeds.js';
 import { isAdmin } from '../../utils/permissions.js';
 import { requireModeratorMember } from '../../utils/permissions.js';
 
@@ -8,6 +8,7 @@ export default {
   data: new SlashCommandBuilder()
     .setName('panel-oluştur')
     .setDescription('Ticket panelini belirtilen kanala kurar')
+    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
     .addChannelOption((option) =>
       option.setName('kanal').setDescription('Panelin yerleştirileceği kanal').addChannelTypes(ChannelType.GuildText, ChannelType.GuildAnnouncement).setRequired(true),
     ),
@@ -32,19 +33,22 @@ export default {
       new ButtonBuilder().setCustomId('ticket_create').setLabel('Ticket Oluştur').setStyle(ButtonStyle.Primary).setEmoji('🎫'),
     );
 
-    const embed = warningEmbed('🎫 Destek Merkezi', [
-      `Merhaba değerli **${env.SERVER_NAME}** oyuncusu!`,
-      '',
-      'Sunucumuzda yaşadığın herhangi bir sorun, hile bildirimi veya merak ettiğin bir konu için buradan destek talebi oluşturabilirsin.',
-      '',
-      '**Destek Kategorilerimiz:**',
-      '🎮 **Oyun İçi Hile Bildirimi**',
-      '🛒 **Mağaza ve VIP İşlemleri**',
-      '🛡️ **Yetkili Şikayeti**',
-      '❓ **Diğer Konular**',
-      '',
-      '*Lütfen destek talebi açarken sorununuzu en detaylı şekilde açıklamaya özen gösterin.*',
-    ].join('\n'));
+    const embed = createEmbed({
+      title: '🎫 Destek Merkezi',
+      description: [
+        `Merhaba değerli **${env.SERVER_NAME}** oyuncusu!`,
+        '',
+        'Sunucumuzda yaşadığın herhangi bir sorun, hile bildirimi veya merak ettiğin bir konu için buradan destek talebi oluşturabilirsin.',
+        '',
+        '**Destek Kategorilerimiz:**',
+        '🎮 **Oyun İçi Hile Bildirimi**',
+        '🛒 **Mağaza ve VIP İşlemleri**',
+        '🛡️ **Yetkili Şikayeti**',
+        '❓ **Diğer Konular**',
+        '',
+        '*Lütfen destek talebi açarken sorununuzu en detaylı şekilde açıklamaya özen gösterin.*',
+      ].join('\n'),
+    });
 
     await channel.send({ embeds: [embed], components: [row] });
     await interaction.editReply({ embeds: [successEmbed('Panel Kuruldu', `<#${channel.id}> kanalına ticket paneli gönderildi.`)] });

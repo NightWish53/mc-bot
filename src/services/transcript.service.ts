@@ -1,5 +1,4 @@
 import type { Message, TextChannel } from 'discord.js';
-import { env } from '../config/env.js';
 
 const MAX_MESSAGES = 2000;
 

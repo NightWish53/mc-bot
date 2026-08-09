@@ -1,7 +1,8 @@
 import type { GuildMember, TextChannel } from 'discord.js';
 import { env } from '../config/env.js';
-import { createEmbed } from '../utils/embeds.js';
 import { logger } from '../utils/logger.js';
+import { renderWelcomeCard } from '../services/welcomeCard.service.js';
+import { AttachmentBuilder } from 'discord.js';
 
 export default {
   name: 'guildMemberRemove',
@@ -9,39 +10,31 @@ export default {
   async execute(member: GuildMember) {
     if (!env.LOBBY_CHANNEL_ID) return;
 
-    let joinedAt: Date | null = null;
+
     try {
-      const fetched = await member.guild.members.fetch(member.id);
-      joinedAt = fetched.joinedAt;
+      await member.guild.members.fetch(member.id);
     } catch {
       // Üye artık sunucuda yok — cache'deki bilgiyle devam et.
-    }
-
-    const memberName = member.user?.tag ?? `Bilinmeyen üye (${member.id})`;
-    const avatar = member.user?.displayAvatarURL({ size: 256 });
-
-    let membershipNote = '';
-    if (joinedAt) {
-      const days = Math.floor((Date.now() - joinedAt.getTime()) / 86_400_000);
-      membershipNote =
-        days === 0
-          ? ' Aynı gün içinde ayrıldı.'
-          : days === 1
-            ? ' 1 gündür üyeydi.'
-            : ` ${days} gündür üyeydi.`;
     }
 
     try {
       const channel = (await member.guild.channels.fetch(env.LOBBY_CHANNEL_ID)) as TextChannel | null;
       if (!channel?.isTextBased()) return;
 
-      const embed = createEmbed({
-        title: 'Üye Ayrıldı',
-        description: `👋 **${memberName}** sunucudan ayrıldı.${membershipNote}`,
-        thumbnail: avatar,
+      const buffer = await renderWelcomeCard({
+        member,
+        type: 'leave',
+        memberCount: member.guild.memberCount,
       });
 
-      await channel.send({ embeds: [embed] });
+      const attachment = buffer ? new AttachmentBuilder(buffer, { name: 'leave.png' }) : null;
+
+      if (!attachment) {
+        logger.warn('Ayrılış resmi oluşturulamadı, mesaj gönderilmedi.');
+        return;
+      }
+
+      await channel.send({ files: [attachment] });
     } catch (error) {
       logger.warn('Ayrılış mesajı gönderilemedi.', error);
     }

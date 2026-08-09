@@ -3,8 +3,9 @@ import { Colors, createEmbed, errorEmbed } from '../../utils/embeds.js';
 
 export default {
   data: new SlashCommandBuilder()
-    .setName('başvuru')
-    .setDescription('Sunucu yetkili başvuru formunu gönderir.'),
+    .setName('başvuru-paneli')
+    .setDescription('Sunucu yetkili başvuru formunu bulunduğunuz kanala gönderir.')
+    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
 
   async execute(interaction: ChatInputCommandInteraction) {
     if (!interaction.memberPermissions?.has(PermissionFlagsBits.Administrator)) {

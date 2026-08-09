@@ -25,7 +25,7 @@ export default {
           const answer = interaction.fields.getTextInputValue(`q${i + 1}`);
           answersObj[q] = answer;
           embedFields.push({ name: q.length > 256 ? q.substring(0, 253) + '...' : q, value: answer, inline: false });
-        } catch (e) {
+        } catch {
           // Input might not exist if modal somehow changed
         }
       }
@@ -42,7 +42,7 @@ export default {
         if (fetched instanceof TextChannel) {
           channel = fetched;
         }
-      } catch (e) {
+      } catch {
         logger.warn(`Başvuru kanalı bulunamadı: ${env.STAFF_APP_CHANNEL_ID}`);
       }
     }
@@ -79,13 +79,19 @@ export default {
         .setEmoji('✅')
         .setStyle(ButtonStyle.Success);
 
-      const rejectButton = new ButtonBuilder()
-        .setCustomId(`staff_app_reject:${app.id}`)
-        .setLabel('Reddet')
+      const rejectSoftButton = new ButtonBuilder()
+        .setCustomId(`staff_app_reject_soft:${app.id}`)
+        .setLabel('Reddet (Tekrar Başvurabilir)')
+        .setEmoji('🔄')
+        .setStyle(ButtonStyle.Secondary);
+
+      const rejectHardButton = new ButtonBuilder()
+        .setCustomId(`staff_app_reject_hard:${app.id}`)
+        .setLabel('Reddet (Kalıcı)')
         .setEmoji('❌')
         .setStyle(ButtonStyle.Danger);
 
-      const row = new ActionRowBuilder<ButtonBuilder>().addComponents(acceptButton, rejectButton);
+      const row = new ActionRowBuilder<ButtonBuilder>().addComponents(acceptButton, rejectSoftButton, rejectHardButton);
 
       await channel.send({ embeds: [embed], components: [row] });
 

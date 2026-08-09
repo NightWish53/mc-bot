@@ -11,9 +11,9 @@ Tek bir sunucu için özelleştirilmiş, kurulumu inanılmaz kolay, hafif ve per
 ## 🌟 Özellikler
 
 *   **⚡ Bağımsız Çalışır:** Sunucuya dışarıdan ping atarak aktif oyuncuları, gecikmeyi ve MOTD'yi anlık olarak çeker.
-*   **📊 Canlı İstatistik Kanalları:** Oyuncu sayısı ve rekor oyuncu verilerini otomatik olarak ses veya metin kanalı ismine yansıtır.
+*   **📊 Canlı İstatistik Kanalları:** Oyuncu sayısı ve rekor oyuncu verilerini otomatik olarak ses kanalı ismine yansıtır.
 *   **🚨 Offline (Çökme) Alarmı:** Sunucu yanıt vermediğinde belirlediğiniz kanala otomatik olarak bildirim gönderir.
-*   **🎫 Gelişmiş Ticket Sistemi:** Kategori seçmeli ticket paneli, ticket devralma/bırakma, transcript (log dosyası) ve yıldızlı puanlama sistemi.
+*   **🎫 Gelişmiş Ticket Sistemi:** Kategori seçmeli ticket paneli, ticket devralma/bırakma, üye ekleme/çıkarma (ticket-ekle / ticket-çıkar), transcript (log dosyası) ve yıldızlı puanlama sistemi.
 *   **💡 Öneri Sistemi:** Üyelerin fikirlerini oylamaya sunan, kabul/red butonlu gelişmiş thread (alt başlık) yapısı.
 *   **🛡️ Moderasyon Sistemi:** Ban, Kick, Uyarı, Timeout (Mute) işlemleri ve detaylı ceza geçmişi kaydı.
 *   **📝 Yetkili Başvuru Sistemi:** Form (Modal) üzerinden başvuru alma ve özel kanaldan onay/red işlemi.
@@ -35,7 +35,7 @@ Tek bir sunucu için özelleştirilmiş, kurulumu inanılmaz kolay, hafif ve per
 Botu kendi bilgisayarınızda veya bir VDS/VPS (Sanal Sunucu) üzerinde kurmak için **iki farklı yöntem** vardır. Eğer komutlarla uğraşmak istemiyorsanız "Tek Tıkla Kurulum" yöntemini seçebilirsiniz.
 
 ### Ön Gereksinimler (Her iki yöntem için de şart)
-*   [Node.js](https://nodejs.org/en/) (v18 veya daha güncel bir sürüm önerilir)
+*   [Node.js](https://nodejs.org/en/) (v20.12 veya daha güncel bir sürüm şarttır)
 *   [pnpm](https://pnpm.io/installation) (Paket yöneticisi: Komut satırına `npm install -g pnpm` yazarak kurabilirsiniz)
 
 ---
@@ -72,7 +72,7 @@ Klasörde bulunan `.env.example` dosyasının adını `.env` olarak değiştirin
 **4. Veritabanını Hazırlayın:**
 Aşağıdaki komut `prisma/data.db` adında gömülü veritabanınızı oluşturur:
 ```bash
-npx prisma migrate dev --name init
+npx prisma db push
 ```
 
 **5. Slash Komutlarını Yükleyin:**
@@ -80,11 +80,40 @@ npx prisma migrate dev --name init
 pnpm deploy-commands
 ```
 
-**6. Botu Başlatın:**
+**6. Projeyi Derleyin ve Başlatın:**
 ```bash
+pnpm build
 pnpm start
 ```
 *(Geliştirme aşamasındaysanız kod değişikliklerini anında görmek için `pnpm dev` kullanabilirsiniz.)*
+
+---
+
+## 📜 Komut Listesi
+
+### 🌐 Genel Komutlar (Herkes Kullanabilir)
+*   `/sunucu`: Minecraft sunucusunun anlık durumunu ve aktif oyuncuları gösterir.
+*   `/yardım`: Gelişmiş, kategorili yardım menüsünü açar.
+*   `/kapat`: Bulunduğunuz aktif destek talebini (ticket) sonlandırır.
+*   `/yetkili-sıralama`: Yetkililerin ticket çözme ve puan sıralamasını gösterir.
+
+### 🛡️ Moderasyon Komutları (Sadece Yetkililer)
+*   `/ban`: Kullanıcıyı sunucudan yasaklar.
+*   `/kick`: Kullanıcıyı sunucudan atar.
+*   `/mute`: Kullanıcıya zaman aşımı (timeout) uygular.
+*   `/unmute`: Kullanıcının zaman aşımını kaldırır.
+*   `/unban`: Kullanıcının yasağını kaldırır.
+*   `/warn`: Kullanıcıya uyarı verir. (Belirli uyarı sayısında otomatik mute atar.)
+*   `/uyarılar`: Kullanıcının aktif uyarılarını listeler.
+*   `/vaka`: Belirli bir vaka numarasının detaylarını gösterir.
+*   `/geçmiş`: Kullanıcının tüm sicil geçmişini gösterir.
+*   `/işlemler`: Bir yetkilinin yaptığı tüm moderasyon işlemlerini listeler.
+*   `/ticket-ekle`: Destek talebine başka bir üyeyi dahil eder.
+*   `/ticket-cikar`: Destek talebinden bir üyeyi çıkarır.
+
+### ⚙️ Kurulum Komutları (Sadece Yöneticiler)
+*   `/panel-oluştur`: Destek talebi açma butonunu bulunduğunuz kanala gönderir.
+*   `/başvuru-paneli`: Yetkili başvuru formunu bulunduğunuz kanala gönderir.
 
 ---
 
@@ -99,4 +128,4 @@ gibi hassas verileriniz **asla GitHub'a yüklenmez**. Tamamen güvenle paylaşab
 ---
 
 ## 👨‍💻 Lisans
-Bu proje açık kaynak kodlu olarak topluluğa sunulmuştur. İstediğiniz gibi geliştirebilir ve kullanabilirsiniz!
+Bu proje **MIT Lisansı** altında açık kaynak kodlu olarak topluluğa sunulmuştur. Detaylar için `LICENSE` dosyasına göz atabilirsiniz. İstediğiniz gibi geliştirebilir ve kullanabilirsiniz!

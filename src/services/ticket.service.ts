@@ -12,7 +12,7 @@ import {
 } from 'discord.js';
 import { env } from '../config/env.js';
 import { prisma } from '../database/prisma.js';
-import { Colors, createEmbed, successEmbed, warningEmbed } from '../utils/embeds.js';
+import { Colors, createEmbed, successEmbed } from '../utils/embeds.js';
 import { safeDm } from '../utils/dm.js';
 import { logger } from '../utils/logger.js';
 import { hasTicketStaffRole } from '../utils/permissions.js';
@@ -229,7 +229,7 @@ export async function releaseTicket(guild: Guild, ticketId: number, actor: Guild
   const channel = await getTicketChannel(guild, ticket.channelId);
   if (channel) {
     await channel.send({
-      embeds: [warningEmbed('Devralma Bırakıldı', 'Bu ticket tekrar devralınabilir durumda.')],
+      embeds: [createEmbed({ title: 'Devralma Bırakıldı', description: 'Bu ticket tekrar devralınabilir durumda.' })],
     });
   }
 

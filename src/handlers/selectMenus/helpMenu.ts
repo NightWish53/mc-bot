@@ -1,6 +1,5 @@
 import type { SelectMenuHandler } from './index.js';
 import { createEmbed, Colors } from '../../utils/embeds.js';
-import { env } from '../../config/env.js';
 import { MessageFlags } from 'discord.js';
 
 const handler: SelectMenuHandler = {
@@ -15,7 +14,6 @@ const handler: SelectMenuHandler = {
         title: '🌐 Genel Komutlar (Kullanıcı)',
         description: `Sunucudaki tüm üyelerin kullanabileceği komutlar:\n\n` +
           `</sunucu:0> - Minecraft sunucusunun anlık durumunu ve aktif oyuncuları gösterir.\n` +
-          `</başvuru:0> - Sunucu yetkili başvuru formunu gönderir.\n` +
           `</yardım:0> - Şu an görüntülediğiniz yardım menüsünü açar.\n\n` +
           `🎫 **Destek (Ticket) Komutları:**\n` +
           `</kapat:0> - Bulunduğunuz aktif destek talebini sonlandırır.\n` +
@@ -45,7 +43,8 @@ const handler: SelectMenuHandler = {
       embed = createEmbed({
         title: '⚙️ Kurulum Komutları (Yönetici)',
         description: `Sunucu sahiplerinin ve üst düzey yöneticilerin (Admin) kullanabileceği komutlar:\n\n` +
-          `</panel-oluştur ticket:0> - Destek talebi açma butonunu bulunduğunuz kanala gönderir.`,
+          `</panel-oluştur:0> - Destek talebi açma butonunu seçtiğiniz kanala gönderir.\n` +
+          `</başvuru-paneli:0> - Yetkili başvuru formunu bulunduğunuz kanala gönderir.`,
         color: Colors.BRAND,
       });
     } else {

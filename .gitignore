@@ -5,3 +5,5 @@ dist/
 *.db-journal
 prisma/dev.db
 logs/
+AGENTS.md
+plan.md

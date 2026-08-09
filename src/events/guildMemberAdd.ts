@@ -1,7 +1,8 @@
 import type { GuildMember, TextChannel } from 'discord.js';
 import { env } from '../config/env.js';
-import { createEmbed } from '../utils/embeds.js';
 import { logger } from '../utils/logger.js';
+import { renderWelcomeCard } from '../services/welcomeCard.service.js';
+import { AttachmentBuilder } from 'discord.js';
 
 export default {
   name: 'guildMemberAdd',
@@ -22,22 +23,20 @@ export default {
       const channel = (await member.guild.channels.fetch(env.LOBBY_CHANNEL_ID)) as TextChannel | null;
       if (!channel?.isTextBased()) return;
 
-      const joinedAt = member.joinedAt ?? new Date();
-      const embed = createEmbed({
-        title: 'Yeni Üye',
-        description: `${member.user} sunucuya katıldı!`,
-        fields: [
-          { name: 'Üye Sırası', value: `${member.guild.memberCount}. üye`, inline: true },
-          {
-            name: 'Katılım Tarihi',
-            value: `<t:${Math.floor(joinedAt.getTime() / 1000)}:D>`,
-            inline: true,
-          },
-        ],
-        thumbnail: member.user.displayAvatarURL({ size: 256 }),
+      const buffer = await renderWelcomeCard({
+        member,
+        type: 'join',
+        memberCount: member.guild.memberCount,
       });
 
-      await channel.send({ embeds: [embed] });
+      const attachment = buffer ? new AttachmentBuilder(buffer, { name: 'welcome.png' }) : null;
+
+      if (!attachment) {
+        logger.warn('Karşılama resmi oluşturulamadı, mesaj gönderilmedi.');
+        return;
+      }
+
+      await channel.send({ files: [attachment] });
     } catch (error) {
       logger.warn('Karşılama mesajı gönderilemedi.', error);
     }
